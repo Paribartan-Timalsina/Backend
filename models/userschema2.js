@@ -15,8 +15,11 @@ const userSchema2=new mongoose.Schema({
         type:String,
         required:false,
         }
-    ]
-    
+    ],
+    Cart:{
+        type:String,
+        required:false,
+    },
 
     
     // tokens:[

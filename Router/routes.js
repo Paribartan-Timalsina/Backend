@@ -11,12 +11,13 @@ const ejs = require("ejs")
 const upload = require("../models/multerr")
 const path = require("path")
 const server=require("./server.js")
+const cookieParser=require("cookie-parser")
 const stripe=require("stripe")(process.env.STRIPE_SECRET_KEY)
 require('./passport-setup');
 
 
 
-
+router.use(cookieParser())
 
 router.use(express.static(__dirname + "./uploadedphotos"))
 router.get("/", (req, res) => res.render("demo"))
@@ -85,6 +86,7 @@ router.post('/register', upload, async (req, res) => {
 });
 router.post('/items', async (req, res) => {
     const { Productname, Price, Category } = req.body
+    const Cart="ADD TO CART"
     // let obj2 = {
     //     Productname: req.body.Productname,
     //     Price: req.body.Price,
@@ -95,7 +97,7 @@ router.post('/items', async (req, res) => {
     // console.log(req.body)
     // res.json({message:req.body})
 
-    const items = await new ITEMS({ Productname, Price, Category })
+    const items = await new ITEMS({ Productname, Price, Category,Cart })
     await items.save()
     console.log(res.json(items))
 
@@ -111,10 +113,10 @@ router.post('/items', async (req, res) => {
     //     }
     // });
 });
-router.post("/displayitems", async (req, res) => {
-    const {Category}=req.body
-    const displayitems = await ITEMS.find({ Category })
-    return res.json(displayitems )
+router.get("/displayitems", async (req, res) => {
+    //const {Category}=req.body
+    const displayitems = await ITEMS.find({ Category:"Branded" })
+    return res.json(displayitems)
     
 })
 router.post("/deleteitems", async (req, res) => {
@@ -124,9 +126,10 @@ router.post("/deleteitems", async (req, res) => {
     //console.log(displayitems)
 })
 router.post("/addingtocart",(req,res)=>{
-    const {mes}=req.body
-    console.log(mes)
-    res.json(mes)
+    const {Productname,Price,Category} = req.body
+
+    console.log(Productname,Price,Category)
+    
 })
 router.post('/logeen', async (req, res) => {
 
@@ -144,18 +147,16 @@ router.post('/logeen', async (req, res) => {
     if (data1) {
         const token = await data1.generateAuthToken()
         console.log(token)
-        res.cookie("jwtoken", token, {
+        
+         res.cookie("jwt", token,{
             expires: new Date(Date.now() + 25892000000),
-            httpOnly: true
-        })
- 
-         res.json({ message: "the data is correct" })
-        // if (name !=data1.name && data1!=email){
-        //     res.sendStatus(400).json({error:"wtf"})
-        // }  
-}
+            httpOnly: true,
+        });
+        console.log(`${req.cookies.jwt}`)
+         res.status(200).send({ message: "the data is correct" })
+         }
     else{
-         res.json({message:"The data isn't found"})
+         res.status(401).send({message:"The data isn't found"})
     }
 }
 })
