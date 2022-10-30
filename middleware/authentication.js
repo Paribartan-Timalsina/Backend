@@ -5,7 +5,8 @@ const dotenv= require('dotenv')
 dotenv.config({path:'./config/config.env'})
 const authentication= async (req,res,next)=>{
 try{
-const token=req.cookies.jwtoken
+const token= req.cookies.jwt
+
 const verifytoken=jwt.verify(token,process.env.SECRET_KEY)
 const rootuse=await User.findOne({_id:verifytoken._id,"tokens.token":token})
 if(!rootuse){throw new Error("user not found")}
