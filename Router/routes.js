@@ -57,10 +57,10 @@ router.post('/register', upload,  (req, res) => {
     const obj = {
         name: req.body.name,
         email: req.body.email,
-        // img: {
-        //     data: fs.readFileSync("./uploadedphotos/" + req.file.filename),
-        //     contentType: "image/png",
-        // },
+        img: {
+            data: fs.readFileSync("./uploadedphotos/" + req.file.filename),
+            contentType: "image/png",
+        },
 
 
     }
@@ -157,8 +157,9 @@ router.post('/logeen', async (req, res) => {
 })
 
 router.get("/about", authentication, (req, res) => {
-    res.send(req.rootuse)
     console.log(req.rootuse.name)
+   return  res.json(req.rootuse)
+    
 })
 
 // router.use(passport.initialize())
