@@ -21,7 +21,7 @@ require('./passport-setup');
 
 
 
-router.use(express.static(__dirname + "../uploadedphotos/"))
+router.use(express.static(__dirname + "/uploadedphotos/"))
 const storeItems = new Map([
     [1, { priceInCents: 10000, name: "Learn React Today" }],
     [2, { priceInCents: 20000, name: "Learn CSS Today" }],
@@ -54,13 +54,14 @@ router.get('/things', async (req, res) => {
 })
 router.post('/register', upload,  (req, res) => {
   
-    const obj = {
+    var obj = {
         name: req.body.name,
         email: req.body.email,
-        img: {
-            data: fs.readFileSync("./uploadedphotos/" + req.file.filename),
-            contentType: "image/png",
-        },
+        // img: {
+        //     data: fs.readFileSync(path.join(__dirname +'./uploadedphotos/' + req.file.filename)),
+        //     contentType: "image/png",
+        // },
+    
 
 
     }
@@ -79,7 +80,7 @@ router.post('/register', upload,  (req, res) => {
     });
 });
 router.post('/items', async (req, res) => {
-    const { Productname, Price, Category } = req.body
+    const { Productname, Price, Quantity,Category } = req.body
     const Cart = "ADD TO CART"
     // let obj2 = {
     //     Productname: req.body.Productname,
@@ -91,7 +92,7 @@ router.post('/items', async (req, res) => {
     // console.log(req.body)
     // res.json({message:req.body})
 
-    const items = await new ITEMS({ Productname, Price, Category, Cart })
+    const items = await new ITEMS({ Productname, Price, Quantity,Category, Cart })
     await items.save()
     console.log(res.json(items))
 
@@ -114,9 +115,17 @@ router.get("/displayitems", async (req, res) => {
 
 })
 router.post("/deleteitems", async (req, res) => {
-    const { Productname } = req.body
-    const deleteitems = await ITEMS.deleteOne({ Productname })
-    res.json({ message: deleteitems })
+    let { product } = req.body
+    const deleteitems = await ITEMS.deleteOne({ product })
+    console.log(product)
+    //console.log(displayitems)
+})
+router.post("/singleproduct", async (req, res) => {
+    let { _id } = req.body
+   
+    const product = await ITEMS.findOne({ _id} )
+    console.log(product)
+    return res.json(product)
     //console.log(displayitems)
 })
 router.post("/addingtocart", (req, res) => {
@@ -160,6 +169,11 @@ router.get("/about", authentication, (req, res) => {
     console.log(req.rootuse.name)
    return  res.json(req.rootuse)
     
+})
+router.get("/logoutt", (req, res) => {
+    console.log("logging out the user")
+   res.clearCookie("jwt",{path:"/"})
+    res.status(200).send("User Logged out seccessfully")
 })
 
 // router.use(passport.initialize())

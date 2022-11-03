@@ -10,6 +10,10 @@ const userSchema2=new mongoose.Schema({
         type:Number,
         required:false,
     },
+    Quantity:{
+        type:Number,
+        required:false,
+    },
     Category:[
         {
         type:String,
