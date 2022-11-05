@@ -108,6 +108,43 @@ router.post('/items', async (req, res) => {
     //     }
     // });
 });
+router.post('/updatedata', async (req, res) => {
+   // const { Productname, Price, Quantity,Category } = req.body
+   const a=req.body
+    Array.from(a).map( async (item)=>{
+        console.log(item)
+        const { Productname, Price, Quantity,Category } = item
+        const items = await  new ITEMS({ Productname, Price, Quantity,Category })
+      await items.save()
+    })
+    // const deleteddata=await ITEMS.deleteMany()
+    
+    // let obj2 = {
+    //     Productname: req.body.Productname,
+    //     Price: req.body.Price,
+    //     Category:req.body.Category,
+
+
+    // }
+    // console.log(req.body)
+    // res.json({message:req.body})
+
+    // const items = await new ITEMS({ Productname, Price, Quantity,Category, Cart })
+    // await items.save()
+    // console.log(res.json(items))
+
+
+    // })
+    // ITEMS.create(obj2, (err, item) => {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     else {
+    //         // item.save();
+    //         res.redirect('/');
+    //     }
+    // });
+});
 router.get("/displayitems", async (req, res) => {
     //const {Category}=req.body
     const displayitems = await ITEMS.find()
@@ -209,11 +246,11 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
             price_data: {
               currency: "usd",
               product_data: {
-                name: storeItem.name,
+                name: item.Productname,
               },
-              unit_amount: storeItem.priceInCents,
+              unit_amount: item.Price,
             },
-            quantity: item.quantity,
+            quantity: item.Quantity,
           }
         }),
         success_url: `${process.env.CLIENT_URL}/itemlist`,
