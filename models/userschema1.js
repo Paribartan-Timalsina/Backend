@@ -24,8 +24,10 @@ const userSchema=new mongoose.Schema({
         required:false,
     },
     img:{
-        data:Buffer,
-       contentType:String,
+       // data:Buffer,
+       type:String,
+       //contentType:String,
+       required:false,
 
     },
     tokens:[

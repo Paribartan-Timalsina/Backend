@@ -21,11 +21,8 @@ require('./passport-setup');
 
 
 
-router.use(express.static(__dirname + "/uploadedphotos/"))
-const storeItems = new Map([
-    [1, { priceInCents: 10000, name: "Learn React Today" }],
-    [2, { priceInCents: 20000, name: "Learn CSS Today" }],
-  ])
+router.use(express.static(__dirname + "/uploads/"))
+
 router.get("/", (req, res) => res.render("demo"))
 
 
@@ -54,17 +51,20 @@ router.get('/things', async (req, res) => {
 })
 router.post('/register', upload,  (req, res) => {
   
-    var obj = {
+    var obj =new User( {
         name: req.body.name,
         email: req.body.email,
-        // img: {
-        //     data: fs.readFileSync(path.join(__dirname +'./uploadedphotos/' + req.file.filename)),
-        //     contentType: "image/png",
-        // },
-    
+        //  img: {
+        //    //  data: fs.readFileSync(path.join(__dirname +'./uploadedphotos/' + req.file.filename)),
+        //    data:req.file.filename,  
+        //    contentType: "image/png",
+        //  },
+       // img:fs.readFileSync(path.join(__dirname +'./uploads/' + req.file.filename))
+
+    img:req.file.filename,
 
 
-    }
+    })
 
 
     
@@ -109,9 +109,11 @@ router.post('/items', async (req, res) => {
     // });
 });
 router.post('/updatedata', async (req, res) => {
+    //console.log(req.body)
    // const { Productname, Price, Quantity,Category } = req.body
+   const deletedata=await ITEMS.deleteMany()
    const a=req.body
-    Array.from(a).map( async (item)=>{
+    Array.from(a).forEach( async (item)=>{
         console.log(item)
         const { Productname, Price, Quantity,Category } = item
         const items = await  new ITEMS({ Productname, Price, Quantity,Category })
@@ -202,15 +204,15 @@ router.post('/logeen', async (req, res) => {
     }
 })
 
-router.get("/about", authentication, (req, res) => {
-    console.log(req.rootuse.name)
-   return  res.json(req.rootuse)
+router.get("/about", authentication,  async (req, res) => {
+    return  res.json(req.rootuse)
+    
     
 })
-router.get("/logoutt", (req, res) => {
+router.post("/logoutt", (req, res) => {
     console.log("logging out the user")
    res.clearCookie("jwt",{path:"/"})
-    res.status(200).send("User Logged out seccessfully")
+    res.status(200).send({message:"User Logged out seccessfully"})
 })
 
 // router.use(passport.initialize())
