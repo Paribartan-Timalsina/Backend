@@ -80,8 +80,8 @@ router.post('/register', upload,  (req, res) => {
     });
 });
 router.post('/items', async (req, res) => {
-    const { Productname, Price, Quantity,Category } = req.body
-    const Cart = "ADD TO CART"
+    const { name, price,company,id,description,colors } = req.body
+
     // let obj2 = {
     //     Productname: req.body.Productname,
     //     Price: req.body.Price,
@@ -92,7 +92,7 @@ router.post('/items', async (req, res) => {
     // console.log(req.body)
     // res.json({message:req.body})
 
-    const items = await new ITEMS({ Productname, Price, Quantity,Category, Cart })
+    const items = await new ITEMS({ name, price,company,id,description,colors })
     await items.save()
     console.log(res.json(items))
 
@@ -115,8 +115,8 @@ router.post('/updatedata', async (req, res) => {
    const a=req.body
     Array.from(a).forEach( async (item)=>{
         console.log(item)
-        const { Productname, Price, Quantity,Category } = item
-        const items = await  new ITEMS({ Productname, Price, Quantity,Category })
+        const { name, price,company,id,description,colors } = item
+        const items = await  new ITEMS({ name, price,company,id,description,colors })
       await items.save()
     })
     // const deleteddata=await ITEMS.deleteMany()
@@ -243,7 +243,7 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
         payment_method_types: ["card"],
         mode: "payment",
         line_items: req.body.items.map(item => {
-          const storeItem = storeItems.get(item.id)
+         
           return {
             price_data: {
               currency: "usd",

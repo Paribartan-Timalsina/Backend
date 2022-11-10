@@ -2,25 +2,31 @@ const dotenv=require("dotenv")
 dotenv.config({path:"../config/db"})
 const mongoose=require("mongoose")
 const userSchema2=new mongoose.Schema({
-    Productname:{
+    id:{
+        type:Number,
+        required:false,
+    },
+   
+    name:{
         type:String,
         required:false,
     },
-    Price:{
+   
+    price:{
         type:Number,
         required:false,
     },
-    Quantity:{
-        type:Number,
+    company:{
+        type:String,
         required:false,
     },
-    Category:[
+    colors:[
         {
         type:String,
         required:false,
         }
     ],
-    Cart:{
+    description:{
         type:String,
         required:false,
     },
