@@ -54,19 +54,18 @@ router.post('/register', upload,  (req, res) => {
     var obj =new User( {
         name: req.body.name,
         email: req.body.email,
-        //  img: {
-        //    //  data: fs.readFileSync(path.join(__dirname +'./uploadedphotos/' + req.file.filename)),
-        //    data:req.file.filename,  
-        //    contentType: "image/png",
-        //  },
+        password:req.body.password,
+         img: {
+            data: fs.readFileSync( 'uploads/' + req.file.filename),
+           
+           contentType: "image/png",
+         },
        // img:fs.readFileSync(path.join(__dirname +'./uploads/' + req.file.filename))
 
-    img:req.file.filename,
+    //img:req.file.filename,
 
 
     })
-
-
     
     User.create(obj, (err, item) => {
         if (err) {
@@ -80,7 +79,7 @@ router.post('/register', upload,  (req, res) => {
     });
 });
 router.post('/items', async (req, res) => {
-    const { name, price,company,id,description,colors } = req.body
+    const { name, price,company,id,description,colors,stars,featured,stock,reviews,category } = req.body
 
     // let obj2 = {
     //     Productname: req.body.Productname,
@@ -92,7 +91,7 @@ router.post('/items', async (req, res) => {
     // console.log(req.body)
     // res.json({message:req.body})
 
-    const items = await new ITEMS({ name, price,company,id,description,colors })
+    const items = await new ITEMS({ name, price,company,id,description,colors,stars,featured,stock,reviews,category })
     await items.save()
     console.log(res.json(items))
 
@@ -176,10 +175,10 @@ router.post("/addingtocart", (req, res) => {
 })
 router.post('/logeen', async (req, res) => {
 
-    const { name, email } = req.body
-    console.log(name)
+    const {  email,password } = req.body
+    console.log(password)
     console.log(email)
-    if (!name || !email) {
+    if (!password || !email) {
         console.log("sucki")
         //    res.json({message:"fill the form correctly"})
         res.status(400).send({ error: "fill the form correctly" })
@@ -188,6 +187,8 @@ router.post('/logeen', async (req, res) => {
     else {
         const data1 = await User.findOne({ email: email })
         if (data1) {
+            const data2=await User.findOne({password:password})
+            if(data2){
             const token = await data1.generateAuthToken()
             console.log(token)
 
@@ -197,6 +198,10 @@ router.post('/logeen', async (req, res) => {
             });
             console.log(`${req.cookies.jwt}`)
             res.status(200).send({ message: "the data is correct" })
+        }
+        else{
+            res.status(401).send({ message: "The data isn't found" })
+        }
         }
         else {
             res.status(401).send({ message: "The data isn't found" })
@@ -248,11 +253,11 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
             price_data: {
               currency: "usd",
               product_data: {
-                name: item.Productname,
+                name: item.name,
               },
-              unit_amount: item.Price,
+              unit_amount: item.price,
             },
-            quantity: item.Quantity,
+            quantity: item.stock,
           }
         }),
         success_url: `${process.env.CLIENT_URL}/itemlist`,

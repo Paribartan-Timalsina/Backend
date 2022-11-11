@@ -16,10 +16,31 @@ const userSchema2=new mongoose.Schema({
         type:Number,
         required:false,
     },
+    stars:{
+        type:Number,
+        required:false,
+    },
+    featured:{
+        type:Boolean,
+        required:false,
+    },
     company:{
         type:String,
         required:false,
     },
+    stock:{
+        type:Number,
+        required:false,
+    },
+    reviews:{
+        type:String,
+        required:false,
+    },
+    category:{
+        type:String,
+        required:false,
+    },
+    
     colors:[
         {
         type:String,
