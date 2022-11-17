@@ -26,7 +26,7 @@ app.use(cors({
  }
   
 ));
-app.use(body_parser.urlencoded({ extended: true }));
+app.use(body_parser.urlencoded({ extended: true,parameterLimit:100000,limit:"500mb" }));
 app.use(cookieParser())
 app.use(express.json())
 app.use(session({
@@ -42,7 +42,7 @@ app.set("view engine", "ejs");
 
 
 app.use( '/',require('./Router/routes'))
-
+app.use('/products', express.static('./products'));
 const PORT=process.env.PORT
 const http=require("http")
 const server = http.createServer(app);

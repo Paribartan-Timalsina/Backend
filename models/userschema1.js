@@ -24,8 +24,8 @@ const userSchema=new mongoose.Schema({
         required:false,
     },
     img:{
-       data:Buffer,
-      // type:String,
+      data:Buffer,
+      //type:String,
        contentType:String,
        required:false,
 
@@ -51,5 +51,5 @@ userSchema.methods.generateAuthToken=async function(){
       console.log(err)  
     }
 }
- const User=mongoose.model('USER',userSchema)
+ const User=mongoose.model('USERS',userSchema)
  module.exports=User

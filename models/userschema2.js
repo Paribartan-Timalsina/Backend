@@ -52,7 +52,13 @@ const userSchema2=new mongoose.Schema({
         required:false,
     },
 
-    
+    image:{
+        //data:Buffer,
+       type:String,
+        // contentType:String,
+         required:false,
+  
+      }
     // tokens:[
     //     {
     //         token:{

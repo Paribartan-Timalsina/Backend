@@ -9,6 +9,7 @@ const authentication = require("../middleware/authentication")
 const fs = require("fs")
 const ejs = require("ejs")
 const upload = require("../models/multerr")
+const productsupload = require("../models/productsmulter")
 const path = require("path")
 
 const session=require("express-session")
@@ -55,12 +56,12 @@ router.post('/register', upload,  (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password:req.body.password,
-         img: {
-            data: fs.readFileSync( 'uploads/' + req.file.filename),
-           
-           contentType: "image/png",
-         },
-       // img:fs.readFileSync(path.join(__dirname +'./uploads/' + req.file.filename))
+        img: {
+            data: fs.readFileSync('./uploads/' + req.file.filename),
+        //    data:req.file.filename,  
+          contentType: "image/png",
+          },
+       //img:fs.readFileSync('./uploads/' + req.file.filename)
 
     //img:req.file.filename,
 
@@ -78,22 +79,48 @@ router.post('/register', upload,  (req, res) => {
         }
     });
 });
-router.post('/items', async (req, res) => {
-    const { name, price,company,id,description,colors,stars,featured,stock,reviews,category } = req.body
+router.post('/items',productsupload, async (req, res) => {
+   // const { name, price,company,id,description,colors,stars,featured,stock,reviews,category,img } = req.body
+    var list =new ITEMS( {
+        name: req.body.name,
+        id:req.body.id,
+        price: req.body.price,
+        company:req.body.company,
+        stock:req.body.stock,
+        stars:req.body.stars,
+        reviews:req.body.reviews,
+        description:req.body.description,
+        featured:req.body.featured,
+        colors:req.body.colors,
+        category:req.body.category,
+         image: req.file.path,
+        //  image: {
+        //      data: fs.readFileSync('./products/' + req.file.filename),
+      
+        //  contentType: "image/png",
+        //    },
+       //img:fs.readFileSync('./uploads/' + req.file.filename)
 
-    // let obj2 = {
-    //     Productname: req.body.Productname,
-    //     Price: req.body.Price,
-    //     Category:req.body.Category,
+    //img:req.file.filename,
+ 
 
+    })
+       
 
-    // }
-    // console.log(req.body)
-    // res.json({message:req.body})
-
-    const items = await new ITEMS({ name, price,company,id,description,colors,stars,featured,stock,reviews,category })
-    await items.save()
-    console.log(res.json(items))
+   
+    ITEMS.create(list, (err, item) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("success")
+            // item.save();
+            res.redirect('/itemlist');
+        }
+    });
+    // const items = await new ITEMS({ name, price,company,id,description,colors,stars,featured,stock,reviews,category,img })
+    // await items.save()
+    // console.log(res.json(items))
 
 
     // })
@@ -114,8 +141,8 @@ router.post('/updatedata', async (req, res) => {
    const a=req.body
     Array.from(a).forEach( async (item)=>{
         console.log(item)
-        const { name, price,company,id,description,colors } = item
-        const items = await  new ITEMS({ name, price,company,id,description,colors })
+        const { name, price,company,id,description,colors,stars,featured,stock,reviews,category,image} = item
+        const items = await  new ITEMS({name, price,company,id,description,colors,stars,featured,stock,reviews,category,image })
       await items.save()
     })
     // const deleteddata=await ITEMS.deleteMany()
@@ -149,13 +176,27 @@ router.post('/updatedata', async (req, res) => {
 router.get("/displayitems", async (req, res) => {
     //const {Category}=req.body
     const displayitems = await ITEMS.find()
+    
+//     let x=[];
+//    displayitems.map(d=>{d.image=d.image.blob(); x.push(d)})
+//   console.log(x)
     return res.json(displayitems)
 
 })
 router.post("/deleteitems", async (req, res) => {
-    let { product } = req.body
-    const deleteitems = await ITEMS.deleteOne({ product })
-    console.log(product)
+    let { name} = req.body
+    
+    const deleteitems = await ITEMS.deleteOne({name})
+    console.log(deleteitems)
+    
+    //console.log(displayitems)
+})
+router.post("/deleteuser", async (req, res) => {
+    let { name} = req.body
+    console.log(name);
+    const deleteitems = await User.deleteOne({name})
+    console.log(deleteitems)
+    
     //console.log(displayitems)
 })
 router.post("/singleproduct", async (req, res) => {
@@ -187,8 +228,8 @@ router.post('/logeen', async (req, res) => {
     else {
         const data1 = await User.findOne({ email: email })
         if (data1) {
-            const data2=await User.findOne({password:password})
-            if(data2){
+            if(data1.password===password){
+           
             const token = await data1.generateAuthToken()
             console.log(token)
 
