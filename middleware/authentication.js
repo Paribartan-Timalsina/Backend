@@ -15,7 +15,7 @@ req.rootuse=rootuse
 req.userID=rootuse._id
 next()
 }catch(err){
-    res.status(401).send("unauthorized")
+    res.status(404).send("unauthorized")
     console.log(err)
 }
 }

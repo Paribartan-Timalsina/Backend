@@ -4,6 +4,7 @@ const passport = require("passport")
 const DB = require('../config/db')
 const User = require('../models/userschema1')
 const ITEMS = require('../models/userschema2')
+const CARTITEMS = require('../models/userschema3')
 const jwt = require("jsonwebtoken")
 const authentication = require("../middleware/authentication")
 const fs = require("fs")
@@ -56,18 +57,12 @@ router.post('/register', upload,  (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password:req.body.password,
-        img: {
-            data: fs.readFileSync('./uploads/' + req.file.filename),
-        //    data:req.file.filename,  
-          contentType: "image/png",
-          },
-       //img:fs.readFileSync('./uploads/' + req.file.filename)
-
-    //img:req.file.filename,
-
-
-    })
-    
+        img: req.file.path
+       })
+    if(!req.body.name||!req.body.email||!req.body.password){
+        res.status(400).send({ error: "fill the form correctly" })
+        return
+    }
     User.create(obj, (err, item) => {
         if (err) {
             console.log(err);
@@ -93,7 +88,7 @@ router.post('/items',productsupload, async (req, res) => {
         featured:req.body.featured,
         colors:req.body.colors,
         category:req.body.category,
-         image: req.file.path,
+       image: req.file.path,
         //  image: {
         //      data: fs.readFileSync('./products/' + req.file.filename),
       
@@ -180,6 +175,18 @@ router.get("/displayitems", async (req, res) => {
 //     let x=[];
 //    displayitems.map(d=>{d.image=d.image.blob(); x.push(d)})
 //   console.log(x)
+
+    return res.json(displayitems)
+
+})
+router.get("/displaycartitems", async (req, res) => {
+    //const {Category}=req.body
+    const displayitems = await CARTITEMS.find()
+    
+//     let x=[];
+//    displayitems.map(d=>{d.image=d.image.blob(); x.push(d)})
+//   console.log(x)
+console.log(displayitems)
     return res.json(displayitems)
 
 })
@@ -187,7 +194,9 @@ router.post("/deleteitems", async (req, res) => {
     let { name} = req.body
     
     const deleteitems = await ITEMS.deleteOne({name})
-    console.log(deleteitems)
+   if(!deleteitems){
+    res.status(400).send({message:"Deleted successfully"})
+   }
     
     //console.log(displayitems)
 })
@@ -199,13 +208,14 @@ router.post("/deleteuser", async (req, res) => {
     
     //console.log(displayitems)
 })
-router.post("/singleproduct", async (req, res) => {
-    let { _id } = req.body
+router.post("/singleproduct/:id", async (req, res) => {
+     let { id } = req.params
    
-    const product = await ITEMS.findOne({ _id} )
-    console.log(product)
+     const product = await ITEMS.findOne({ id} )
+     console.log(product)
     return res.json(product)
     //console.log(displayitems)
+   // res.send(req.params)
 })
 router.post("/addingtocart", (req, res) => {
     // const {Productname,Price,Category} = req.body
@@ -251,8 +261,13 @@ router.post('/logeen', async (req, res) => {
 })
 
 router.get("/about", authentication,  async (req, res) => {
+    if(!req.rootuse){
+        console.log("xya xya namileko")
+        res.status(404).send({message:"User isn't  Logged in seccessfully"})
+    }
+    else{
     return  res.json(req.rootuse)
-    
+    }
     
 })
 router.post("/logoutt", (req, res) => {
@@ -285,6 +300,16 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
   
   router.post("/create-checkout-session", async (req, res) => {
     try {
+        const a=req.body
+        console.log(a)
+    // a.items.map( async (item)=>{
+    //     console.log(item)
+    //     const { name, price,company,category,image,stock} = item
+    //     const items = await  new CARTITEMS({name, price,company,category,image ,stock})
+    //   await items.save()
+    // })
+    const items=await new CARTITEMS({a})
+    await items.save()
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -292,7 +317,7 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
          
           return {
             price_data: {
-              currency: "usd",
+              currency: "npr",
               product_data: {
                 name: item.name,
               },

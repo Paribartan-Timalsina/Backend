@@ -2,6 +2,8 @@
 const mongoose=require('mongoose')
 const Db=require('../config/db')
 const jwt=require("jsonwebtoken")
+const CARTITEMS = require('./userschema3')
+const {ObjectId} = mongoose.Schema;
 const userSchema=new mongoose.Schema({
     name:{
         type:String,
@@ -24,11 +26,17 @@ const userSchema=new mongoose.Schema({
         required:false,
     },
     img:{
-      data:Buffer,
-      //type:String,
-       contentType:String,
+     // data:Buffer,
+      type:String,
+      default:"myimage-999999/png",
+       //contentType:String,
        required:false,
 
+    },
+    cartitems:{
+        type :  mongoose.Schema.Types.ObjectId,
+        ref :  "CARTITEMS",
+        
     },
     tokens:[
         {
